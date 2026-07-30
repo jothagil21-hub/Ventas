@@ -1,7 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import type { ProductFormState } from "@/app/productos/actions";
+import { ProductPhoto } from "@/components/product-photo";
 import { TAX_RATES } from "@/lib/format";
 
 type CategoryOption = { id: string; name: string };
@@ -32,11 +33,28 @@ export function ProductForm({
   submitLabel,
 }: Props) {
   const [state, formAction, pending] = useActionState(action, {});
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
+  function onPhotoChange(file: File | null) {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    if (!file) {
+      setPreviewUrl(null);
+      return;
+    }
+    setPreviewUrl(URL.createObjectURL(file));
+  }
+
+  const shownPhoto = previewUrl ?? initial?.photoUrl ?? null;
 
   return (
     <form
       action={formAction}
-      encType="multipart/form-data"
       className="grid max-w-2xl gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
     >
       {state.error ? (
@@ -129,15 +147,28 @@ export function ProductForm({
           name="photo"
           type="file"
           accept="image/jpeg,image/png,image/webp,image/gif"
+          onChange={(e) => onPhotoChange(e.target.files?.[0] ?? null)}
           className="block w-full text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-teal-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-teal-800"
         />
-        {initial?.photoUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={initial.photoUrl}
-            alt="Foto actual"
-            className="mt-2 h-24 w-24 rounded-lg object-cover"
-          />
+        {shownPhoto ? (
+          <div className="mt-3">
+            {previewUrl ? (
+              // Local blob preview (not yet uploaded)
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={previewUrl}
+                alt="Vista previa"
+                className="h-24 w-24 rounded-lg object-cover ring-1 ring-slate-200"
+              />
+            ) : (
+              <ProductPhoto
+                src={shownPhoto}
+                alt="Foto actual"
+                size="md"
+                className="ring-1 ring-slate-200"
+              />
+            )}
+          </div>
         ) : null}
       </Field>
 

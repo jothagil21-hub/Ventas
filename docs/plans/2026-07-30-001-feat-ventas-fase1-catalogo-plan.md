@@ -74,6 +74,15 @@ Sistema de ventas construido por fases: catálogo → inventario mixto → factu
 3. **Fase 3:** POS + factura POS elaborada (campos fiscales Colombia)
 4. **Fase 4:** factura electrónica DIAN
 
+### Credenciales de ingreso (seed)
+
+Usuarios creados con `npm run db:setup` / `npm run db:seed`. App en [http://localhost:3000](http://localhost:3000).
+
+| Rol | Correo | Contraseña |
+|---|---|---|
+| Admin | `admin@ventas.local` | `admin123` |
+| Vendedor | `vendedor@ventas.local` | `vendedor123` |
+
 ### Technical notes (implementation)
 
 - Next.js App Router + TypeScript + Tailwind

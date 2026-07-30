@@ -15,7 +15,7 @@ export default async function EditBranchPage({
 
   return (
     <AppShell>
-      <h1 className="mb-6 text-2xl font-semibold">Editar sucursal</h1>
+      <h1 className="mb-6 text-2xl font-semibold">Editar ubicación</h1>
       <BranchForm
         action={updateBranch.bind(null, branch.id)}
         submitLabel="Guardar cambios"
@@ -23,6 +23,7 @@ export default async function EditBranchPage({
           name: branch.name,
           address: branch.address,
           active: branch.active,
+          type: branch.type,
         }}
       />
     </AppShell>

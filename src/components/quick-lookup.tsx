@@ -1,6 +1,7 @@
 "use client";
 
 import { useDeferredValue, useMemo, useState } from "react";
+import { ProductPhoto } from "@/components/product-photo";
 import { formatCOP, formatTaxRate } from "@/lib/format";
 
 export type LookupProduct = {
@@ -11,6 +12,8 @@ export type LookupProduct = {
   salePrice: string;
   taxRate: number;
   categoryName: string;
+  stockTotal: number;
+  stockByBranch: { branchName: string; quantity: number }[];
 };
 
 export function QuickLookup({ products }: { products: LookupProduct[] }) {
@@ -54,19 +57,12 @@ export function QuickLookup({ products }: { products: LookupProduct[] }) {
             key={product.id}
             className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
           >
-            <div className="aspect-[4/3] bg-slate-100">
-              {product.photoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={product.photoUrl}
-                  alt={product.name}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center text-sm text-slate-400">
-                  Sin foto
-                </div>
-              )}
+            <div className="relative h-56 w-full shrink-0 overflow-hidden bg-slate-50">
+              <ProductPhoto
+                src={product.photoUrl}
+                alt={product.name}
+                size="fill"
+              />
             </div>
             <div className="p-4">
               <p className="font-mono text-xs text-teal-700">{product.sku}</p>
@@ -80,6 +76,16 @@ export function QuickLookup({ products }: { products: LookupProduct[] }) {
               <p className="text-xs text-slate-500">
                 IVA {formatTaxRate(product.taxRate)}
               </p>
+              <p className="mt-3 text-sm font-medium text-slate-800">
+                Stock total: {product.stockTotal}
+              </p>
+              <ul className="mt-1 space-y-0.5 text-xs text-slate-500">
+                {product.stockByBranch.map((row) => (
+                  <li key={row.branchName}>
+                    {row.branchName}: {row.quantity}
+                  </li>
+                ))}
+              </ul>
             </div>
           </article>
         ))}

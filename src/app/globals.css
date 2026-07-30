@@ -25,3 +25,13 @@ h1,
 h2 {
   font-family: var(--font-display), var(--font-sans), system-ui, sans-serif;
 }
+
+@media print {
+  body {
+    background: white !important;
+  }
+
+  .print\:hidden {
+    display: none !important;
+  }
+}

@@ -1,4 +1,5 @@
 import { AppShell } from "@/components/app-shell";
+import { ProductPhoto } from "@/components/product-photo";
 import { prisma } from "@/lib/prisma";
 import { formatCOP, formatTaxRate } from "@/lib/format";
 import Link from "next/link";
@@ -46,18 +47,11 @@ export default async function ProductsPage() {
               <tr key={product.id} className="border-t border-slate-100">
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-3">
-                    {product.photoUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={product.photoUrl}
-                        alt=""
-                        className="h-10 w-10 rounded-md object-cover"
-                      />
-                    ) : (
-                      <div className="flex h-10 w-10 items-center justify-center rounded-md bg-slate-100 text-xs text-slate-400">
-                        N/A
-                      </div>
-                    )}
+                    <ProductPhoto
+                      src={product.photoUrl}
+                      alt={product.name}
+                      size="sm"
+                    />
                     <span className="font-medium text-slate-900">
                       {product.name}
                     </span>

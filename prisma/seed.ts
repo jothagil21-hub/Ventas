@@ -1,12 +1,20 @@
 import "dotenv/config";
-import { PrismaClient, Role } from "../src/generated/prisma/client";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
+import {
+  BranchType,
+  PrismaClient,
+  Role,
+} from "../src/generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 
-const adapter = new PrismaBetterSqlite3({
-  url: process.env.DATABASE_URL ?? "file:./prisma/dev.db",
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+  throw new Error("DATABASE_URL no está definida");
+}
+
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({ connectionString }),
 });
-const prisma = new PrismaClient({ adapter });
 
 async function main() {
   const passwordHash = await bcrypt.hash("admin123", 10);
@@ -44,26 +52,53 @@ async function main() {
     },
   });
 
-  const existingBranches = await prisma.branch.count({
-    where: { companyId: company.id },
+  const warehouse = await prisma.branch.upsert({
+    where: { id: "seed-warehouse" },
+    update: {
+      name: "Bodega Central",
+      type: BranchType.WAREHOUSE,
+      active: true,
+    },
+    create: {
+      id: "seed-warehouse",
+      name: "Bodega Central",
+      address: "Calle 1 #1-10, Bogotá",
+      active: true,
+      type: BranchType.WAREHOUSE,
+      companyId: company.id,
+    },
   });
 
-  if (existingBranches === 0) {
+  const existingStores = await prisma.branch.count({
+    where: { companyId: company.id, type: BranchType.STORE },
+  });
+
+  if (existingStores === 0) {
     await prisma.branch.createMany({
       data: [
         {
           name: "Sucursal Centro",
           address: "Calle 10 #5-20, Bogotá",
           active: true,
+          type: BranchType.STORE,
           companyId: company.id,
         },
         {
           name: "Sucursal Norte",
           address: "Av. 19 #120-45, Bogotá",
           active: true,
+          type: BranchType.STORE,
           companyId: company.id,
         },
       ],
+    });
+  } else {
+    await prisma.branch.updateMany({
+      where: {
+        companyId: company.id,
+        NOT: { id: warehouse.id },
+      },
+      data: { type: BranchType.STORE },
     });
   }
 
@@ -73,7 +108,7 @@ async function main() {
     create: { name: "General", active: true },
   });
 
-  await prisma.product.upsert({
+  const product = await prisma.product.upsert({
     where: { sku: "DEMO-001" },
     update: {},
     create: {
@@ -86,6 +121,30 @@ async function main() {
       categoryId: category.id,
     },
   });
+
+  const stockCount = await prisma.stockBalance.count({
+    where: { productId: product.id, branchId: warehouse.id },
+  });
+
+  if (stockCount === 0) {
+    await prisma.stockBalance.create({
+      data: {
+        productId: product.id,
+        branchId: warehouse.id,
+        quantity: 50,
+      },
+    });
+    await prisma.stockMovement.create({
+      data: {
+        type: "ENTRY",
+        productId: product.id,
+        branchId: warehouse.id,
+        quantity: 50,
+        balanceAfter: 50,
+        note: "Carga inicial seed",
+      },
+    });
+  }
 
   console.log("Seed completado.");
   console.log("Admin: admin@ventas.local / admin123");

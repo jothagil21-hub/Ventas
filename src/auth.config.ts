@@ -42,7 +42,9 @@ export const authConfig = {
         pathname.startsWith("/admin") ||
         pathname.startsWith("/productos") ||
         pathname.startsWith("/categorias") ||
-        pathname.startsWith("/sucursales");
+        pathname.startsWith("/sucursales") ||
+        pathname.startsWith("/inventario/ajuste") ||
+        pathname.startsWith("/inventario/traslado");
 
       if (isLoggedIn && adminOnly && role !== "ADMIN") {
         return Response.redirect(new URL("/consulta", request.nextUrl));

@@ -1,7 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ["better-sqlite3", "@prisma/adapter-better-sqlite3"],
+  serverExternalPackages: ["pg", "@prisma/adapter-pg"],
+  images: {
+    localPatterns: [
+      {
+        pathname: "/uploads/**",
+        search: "",
+      },
+    ],
+  },
 };
 
 export default nextConfig;

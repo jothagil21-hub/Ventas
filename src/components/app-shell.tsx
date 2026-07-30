@@ -3,13 +3,21 @@ import { logoutAction } from "@/app/login/actions";
 import Link from "next/link";
 import { isAdmin } from "@/lib/auth-helpers";
 
-const sellerLinks = [{ href: "/consulta", label: "Consulta rápida" }];
+const sellerLinks = [
+  { href: "/consulta", label: "Consulta rápida" },
+  // { href: "/pos", label: "POS" },
+  { href: "/facturas", label: "Facturas" },  
+  { href: "/inventario", label: "Inventario" },
+];
 
 const adminLinks = [
   { href: "/consulta", label: "Consulta rápida" },
+  // { href: "/pos", label: "POS" },
+  { href: "/facturas", label: "Facturas" },  
   { href: "/productos", label: "Productos" },
   { href: "/categorias", label: "Categorías" },
-  { href: "/sucursales", label: "Sucursales" },
+  { href: "/sucursales", label: "Ubicaciones" },
+  { href: "/inventario", label: "Inventario" },
 ];
 
 export async function AppShell({ children }: { children: React.ReactNode }) {

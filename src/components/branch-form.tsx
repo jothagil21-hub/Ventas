@@ -8,7 +8,12 @@ type Props = {
     prev: BranchFormState,
     formData: FormData,
   ) => Promise<BranchFormState>;
-  initial?: { name: string; address?: string | null; active: boolean };
+  initial?: {
+    name: string;
+    address?: string | null;
+    active: boolean;
+    type?: "WAREHOUSE" | "STORE";
+  };
   submitLabel: string;
 };
 
@@ -38,6 +43,20 @@ export function BranchForm({ action, initial, submitLabel }: Props) {
         ) : null}
       </div>
       <div className="flex flex-col gap-1.5">
+        <label className="text-sm font-medium text-slate-700">Tipo</label>
+        <select
+          name="type"
+          className="input"
+          defaultValue={initial?.type ?? "STORE"}
+        >
+          <option value="STORE">Punto de venta</option>
+          <option value="WAREHOUSE">Bodega</option>
+        </select>
+        {state.fieldErrors?.type?.[0] ? (
+          <p className="text-xs text-red-600">{state.fieldErrors.type[0]}</p>
+        ) : null}
+      </div>
+      <div className="flex flex-col gap-1.5">
         <label className="text-sm font-medium text-slate-700">Dirección</label>
         <input
           name="address"
@@ -52,7 +71,7 @@ export function BranchForm({ action, initial, submitLabel }: Props) {
           defaultChecked={initial?.active ?? true}
           className="size-4 rounded border-slate-300 text-teal-700"
         />
-        Sucursal activa
+        Ubicación activa
       </label>
       <button
         type="submit"

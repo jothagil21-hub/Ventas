@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 enum Role {
@@ -12,14 +12,35 @@ enum Role {
   SELLER
 }
 
+enum BranchType {
+  WAREHOUSE
+  STORE
+}
+
+enum StockMovementType {
+  ENTRY
+  ADJUSTMENT
+  TRANSFER_OUT
+  TRANSFER_IN
+  SALE
+}
+
+enum PaymentMethod {
+  CASH
+  CARD
+  TRANSFER
+}
+
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String          @id @default(cuid())
+  email        String          @unique
   name         String
   passwordHash String
-  role         Role     @default(SELLER)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  role         Role            @default(SELLER)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  movements    StockMovement[]
+  invoices     Invoice[]
 }
 
 model Company {
@@ -32,14 +53,18 @@ model Company {
 }
 
 model Branch {
-  id        String   @id @default(cuid())
-  name      String
-  address   String?
-  active    Boolean  @default(true)
-  companyId String
-  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String          @id @default(cuid())
+  name       String
+  address    String?
+  active     Boolean         @default(true)
+  type       BranchType      @default(STORE)
+  companyId  String
+  company    Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  stocks     StockBalance[]
+  movements  StockMovement[]
+  invoices   Invoice[]
 }
 
 model Category {
@@ -52,16 +77,90 @@ model Category {
 }
 
 model Product {
-  id         String   @id @default(cuid())
+  id         String          @id @default(cuid())
   name       String
-  sku        String   @unique
+  sku        String          @unique
   photoUrl   String?
   costPrice  Decimal
   salePrice  Decimal
-  taxRate    Float    @default(19)
-  active     Boolean  @default(true)
+  taxRate    Float           @default(19)
+  active     Boolean         @default(true)
   categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  category   Category        @relation(fields: [categoryId], references: [id])
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  stocks     StockBalance[]
+  movements  StockMovement[]
+  invoiceItems InvoiceItem[]
+}
+
+model StockBalance {
+  id        String   @id @default(cuid())
+  productId String
+  branchId  String
+  quantity  Int      @default(0)
+  updatedAt DateTime @updatedAt
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  branch    Branch   @relation(fields: [branchId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, branchId])
+  @@index([branchId])
+}
+
+model StockMovement {
+  id              String            @id @default(cuid())
+  type            StockMovementType
+  productId       String
+  branchId        String
+  quantity        Int
+  balanceAfter    Int
+  note            String?
+  transferGroupId String?
+  userId          String?
+  createdAt       DateTime          @default(now())
+  product         Product           @relation(fields: [productId], references: [id], onDelete: Cascade)
+  branch          Branch            @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  user            User?             @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([productId, createdAt])
+  @@index([branchId, createdAt])
+  @@index([transferGroupId])
+}
+
+model Invoice {
+  id               String        @id @default(cuid())
+  number           String        @unique
+  branchId         String
+  userId           String
+  paymentMethod    PaymentMethod
+  customerName     String?
+  customerDocument String?
+  subtotal         Decimal
+  taxTotal         Decimal
+  total            Decimal
+  createdAt        DateTime      @default(now())
+  branch           Branch        @relation(fields: [branchId], references: [id])
+  user             User          @relation(fields: [userId], references: [id])
+  items            InvoiceItem[]
+
+  @@index([createdAt])
+  @@index([branchId, createdAt])
+}
+
+model InvoiceItem {
+  id          String  @id @default(cuid())
+  invoiceId   String
+  productId   String
+  productName String
+  sku         String
+  quantity    Int
+  unitPrice   Decimal
+  taxRate     Float
+  lineSubtotal Decimal
+  lineTax     Decimal
+  lineTotal   Decimal
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  product     Product @relation(fields: [productId], references: [id])
+
+  @@index([invoiceId])
 }
