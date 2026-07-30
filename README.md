@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sistema de Ventas
 
-## Getting Started
+App web multi-sucursal (Colombia). **Fase 1:** fundación + catálogo comercial + consulta rápida.
 
-First, run the development server:
+## Requisitos
+
+- Node.js 22+
+- npm
+
+> En desarrollo se usa **SQLite** (no requiere PostgreSQL local). El esquema Prisma está listo para pasar a Postgres en producción.
+
+## Arranque
 
 ```bash
+npm install
+cp .env.example .env
+npm run db:setup
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Usuarios seed
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Rol | Correo | Contraseña |
+|---|---|---|
+| Admin | `admin@ventas.local` | `admin123` |
+| Vendedor | `vendedor@ventas.local` | `vendedor123` |
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
+| Script | Descripción |
+|---|---|
+| `npm run dev` | Servidor de desarrollo |
+| `npm run build` | Build de producción |
+| `npm run db:migrate` | Migraciones Prisma |
+| `npm run db:seed` | Datos iniciales |
+| `npm run db:setup` | Migrar + seed |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Módulos Fase 1
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Login y roles (Admin / Vendedor)
+- Sucursales (sin stock)
+- Categorías y productos (foto, SKU, precios, IVA)
+- Consulta rápida para mostrador
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Contrato de producto: [docs/plans/2026-07-30-001-feat-ventas-fase1-catalogo-plan.md](docs/plans/2026-07-30-001-feat-ventas-fase1-catalogo-plan.md)

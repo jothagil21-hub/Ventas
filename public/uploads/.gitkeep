@@ -1,0 +1,8 @@
+# uploads
+/public/uploads/*
+!/public/uploads/.gitkeep
+
+# sqlite
+/prisma/*.db
+/prisma/*.db-journal
+/prisma/dev.db*

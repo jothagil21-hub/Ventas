@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum Role {
+  ADMIN
+  SELLER
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         Role     @default(SELLER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  nit       String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  branches  Branch[]
+}
+
+model Branch {
+  id        String   @id @default(cuid())
+  name      String
+  address   String?
+  active    Boolean  @default(true)
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  products  Product[]
+}
+
+model Product {
+  id         String   @id @default(cuid())
+  name       String
+  sku        String   @unique
+  photoUrl   String?
+  costPrice  Decimal
+  salePrice  Decimal
+  taxRate    Float    @default(19)
+  active     Boolean  @default(true)
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
