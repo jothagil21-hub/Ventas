@@ -51,7 +51,7 @@ Abre [http://localhost:3000](http://localhost:3000).
 
 1. Variables: `DATABASE_URL`, `AUTH_SECRET`, `AUTH_URL` (URL del deploy)
 2. Build command sugerido: `prisma generate && prisma migrate deploy && next build`
-3. Fotos de productos: hoy se guardan en `public/uploads` (no persistente en Vercel). Para producción hace falta object storage (Vercel Blob, S3, etc.) — pendiente.
+3. Fotos de productos: configura `BLOB_READ_WRITE_TOKEN` (Vercel Blob). Sin eso las fotos no persisten en producción.
 
 ## Base de datos
 

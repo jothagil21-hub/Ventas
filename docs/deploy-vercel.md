@@ -15,6 +15,7 @@ That runs `prisma migrate deploy && prisma generate && next build`.
 - `DATABASE_URL` — PostgreSQL connection string (`postgres://...` or `postgresql://...`)
 - `AUTH_SECRET` — long random secret
 - `AUTH_URL` — public app URL (`https://your-app.vercel.app`)
+- `BLOB_READ_WRITE_TOKEN` — Vercel Blob read/write token (product photos)
 
 ## Temporary Prisma Postgres
 
